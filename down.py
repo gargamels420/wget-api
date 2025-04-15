@@ -10,8 +10,7 @@ downloaded_files = []
 api = Flask(__name__)
  
 # Function to download with progress reporting
-def download_file(url, task_id):
-    local_filename = url.split('/')[-1]
+def download_file(url, task_id, local_filename):
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
         total_length = r.headers.get('content-length')
@@ -35,6 +34,15 @@ def download_file(url, task_id):
     # Append the filename and URL to the list after download completes
     downloaded_files.append({"id": task_id, "url": url, "filename": local_filename})
     return f"Download complete: {local_filename}"
+
+def has_invalid_chars(filename):
+    # List of invalid characters (common on Windows)
+    invalid_chars = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
+
+    for char in invalid_chars:
+        if char in filename:
+            return True
+    return False
  
 # Store progress of each download task
 download_progress = {}
@@ -49,14 +57,21 @@ def get_companies():
 @api.route('/download', methods=['POST'])
 def post_download():
     url = request.args.get('url')
+    local_filename = url.split('/')[-1]
+    
     if not url:
         return jsonify({"error": "URL parameter is missing"}), 400
- 
+    elif has_invalid_chars(local_filename) == True:
+        local_filename = request.args.get('local_filename')
+        if not local_filename or has_invalid_chars(local_filename) == True:
+            return jsonify({"error": "local_filename parameter is missing"})
+    
+
     # Create a task ID for the download
     task_id = str(uuid.uuid4())
  
     # Start the download in a separate thread
-    download_thread = threading.Thread(target=download_file, args=(url, task_id))
+    download_thread = threading.Thread(target=download_file, args=(url, task_id, local_filename))
     download_thread.start()
  
     # Return task ID to track progress
