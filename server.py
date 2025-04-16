@@ -5,6 +5,8 @@ import threading
 import os
 import metadata_services
 
+#<-----------------------after start------------------------->
+
 DOWNLOAD_FOLDER = "downloads"
 
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
@@ -16,7 +18,21 @@ METADATA_FILE = "download_metadata.json"
 cancel_flags = {}
 download_progress = {}
 
-# ---------------------- Download Helpers ----------------------
+def auto_resume_download():
+    meta_bunch = metadata_services.load_metadata()
+    for meta in meta_bunch:
+        meta_data = meta_bunch[meta]
+        if meta_data["status"] == "in_progress":
+            thread = threading.Thread(target=download_file, args=(meta_data["url"], meta, meta_data["filename"]))
+            thread.start()
+
+auto_resume_download()
+
+
+
+
+
+#<---------------------- Download Helpers ---------------------->
 
 def update_progress(task_id, progress):
     download_progress[task_id] = progress
@@ -68,8 +84,7 @@ def download_file(url, task_id, local_filename):
     })
     print(f"Download {task_id} complete.")
 
-# ---------------------- API Routes ----------------------
-
+#<---------------------- API Routes ---------------------->
 @api.route('/download', methods=['POST'])
 def post_download():
     url = request.args.get('url')
@@ -162,11 +177,11 @@ def resume_download():
 
     return jsonify({"message": f"Resuming download for task {task_id}"}), 200
 
-@api.route('/status', methods=['GET'])
+@api.route('/', methods=['GET'])
 def get_status():
     return jsonify(metadata_services.load_metadata())
 
-# ---------------------- Run Server ----------------------
+#<---------------------- Run Server ---------------------->
 
 if __name__ == '__main__':
     api.run(debug=True)
