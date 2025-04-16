@@ -5,6 +5,10 @@ import threading
 import os
 import metadata_services
 
+DOWNLOAD_FOLDER = "downloads"
+
+os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
+
 api = Flask(__name__)
 
 # File-based metadata path
@@ -25,7 +29,8 @@ def has_invalid_chars(filename):
     return False
 
 def download_file(url, task_id, local_filename):
-    part_file = local_filename + ".part"
+    full_path = os.path.join(DOWNLOAD_FOLDER, local_filename)
+    part_file = full_path + ".part"
     start_byte = 0
 
     try:
