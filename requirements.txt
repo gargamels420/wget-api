@@ -1,0 +1,5 @@
+flask
+requests
+uuid
+threading
+os

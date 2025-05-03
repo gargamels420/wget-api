@@ -18,16 +18,6 @@ METADATA_FILE = "download_metadata.json"
 cancel_flags = {}
 download_progress = {}
 
-def auto_resume_download():
-    meta_bunch = metadata_services.load_metadata()
-    for meta in meta_bunch:
-        meta_data = meta_bunch[meta]
-        if meta_data["status"] == "in_progress":
-            thread = threading.Thread(target=download_file, args=(meta_data["url"], meta, meta_data["filename"]))
-            thread.start()
-
-auto_resume_download()
-
 
 
 
@@ -181,7 +171,24 @@ def resume_download():
 def get_status():
     return jsonify(metadata_services.load_metadata())
 
+@api.route('/webui', methods=['GET'])
+def get_webui():
+    with open("index.html","r") as f:
+        webpage = f.read()
+    return webpage
+
+
 #<---------------------- Run Server ---------------------->
+
+def auto_resume_download():
+    meta_bunch = metadata_services.load_metadata()
+    for meta in meta_bunch:
+        meta_data = meta_bunch[meta]
+        if meta_data["status"] == "in_progress":
+            thread = threading.Thread(target=download_file, args=(meta_data["url"], meta, meta_data["filename"]))
+            thread.start()
+
+auto_resume_download()
 
 if __name__ == '__main__':
     api.run(debug=True)
