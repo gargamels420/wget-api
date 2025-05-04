@@ -40,7 +40,7 @@ Server will start on `http://localhost:5000`
 ### Build the image
 
 ```bash
-docker build -t flask-downloader .
+docker build -t wget-api .
 ```
 
 ### Run the container
