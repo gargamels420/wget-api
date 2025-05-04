@@ -1,4 +1,4 @@
-# 🗂️ Flask Download Manager API
+# 🗂️ wget API
 
 A lightweight download manager with a web interface built using Flask. Supports downloading files from URLs with progress tracking, stopping, resuming, and cancelling.
 
@@ -26,7 +26,7 @@ A lightweight download manager with a web interface built using Flask. Supports 
 
 ```bash
 git clone https://github.com/yourusername/flask-download-manager.git
-cd flask-download-manager
+cd wget-api
 pip install -r requirements.txt
 python app.py
 ````
@@ -55,7 +55,7 @@ docker run -d -p 5000:5000 --name downloader flask-downloader
 docker run -d -p 5000:5000 \
   -v "$(pwd)/downloads:/app/downloads" \
   --name downloader \
-  flask-downloader
+  wget-api
 ```
 
 ---
@@ -74,7 +74,7 @@ services:
       - "5000:5000"
     volumes:
       - ./downloads:/app/downloads
-    container_name: flask_downloader
+    container_name: wget-api
 ```
 
 Then run:
